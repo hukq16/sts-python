@@ -9,7 +9,7 @@ void test_java_random() {
     java::Random randomJava(12345678);
 
     // Test nextInt()
-    std::cout << "java::Random nextInt(): " << randomJava.nextInt() << std::endl;
+    std::cout << "java::Random nextInt(): " << randomJava.nextLong() << std::endl;
 
     // Test nextInt(bound)
     std::cout << "java::Random nextInt(100): " << randomJava.nextInt(100) << std::endl;
@@ -29,19 +29,19 @@ void test_java_random() {
 // Test for sts::Random
 void test_sts_random() {
     // Test constructor and seed
-    sts::Random randomSts(12345678);
-
+    sts::stsRandom randomSts(456344);
+    sts::RandomXS128 cxsRandom;
     // Test nextInt()
-    std::cout << "sts::Random nextInt(): " << randomSts.nextInt() << std::endl;
+    std::cout << "sts::Random murmurHash3(343): " << cxsRandom.murmurHash3(343) << std::endl;
 
     // Test nextDouble()
-    std::cout << "sts::Random nextDouble(): " << randomSts.nextDouble() << std::endl;
+    std::cout << "sts::Random nextDouble(): " << cxsRandom.nextDouble() << std::endl;
 
     // Test nextFloat()
-    std::cout << "sts::Random nextFloat(): " << randomSts.nextFloat() << std::endl;
+    std::cout << "sts::Random nextFloat(): " << cxsRandom.nextFloat() << std::endl;
 
     // Test nextBoolean()
-    std::cout << "sts::Random nextBoolean(): " << std::boolalpha << randomSts.nextBoolean() << std::endl;
+    std::cout << "sts::Random nextBoolean(): " << std::boolalpha << cxsRandom.nextBoolean() << std::endl;
 
     // Test random range methods
     std::cout << "sts::Random random(10): " << randomSts.random(10) << std::endl;
