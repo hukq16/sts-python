@@ -2,7 +2,7 @@
 # 根据实际情况，你可能需要创建或导入以下模块的Python版本
 import math
 import random
-from AbstractOrb import AbstractOrb
+from .AbstractOrb import AbstractOrb
 
 
 class Lightning(AbstractOrb):

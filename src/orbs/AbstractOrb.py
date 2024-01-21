@@ -1,14 +1,13 @@
-# 导入所需库
-import math
 
 
 
-from .Lightning import Lightning
+from ..badlogic.math.MathUtils import MathUtils
+
+from ..core import GlobalVar
 
 
 
-
-
+AbstractDungeon = GlobalVar.get_value("abstractdungeon")
 class AbstractOrb:
 
     def __init__(self):
@@ -22,16 +21,10 @@ class AbstractOrb:
 
 
 
+
     def onEvoke(self):
         raise NotImplementedError
 
-    @staticmethod
-    def getRandomOrb(useCardRng):
-        orbs = [Dark(), Frost(), Lightning(), Plasma()]
-        if useCardRng:
-            return orbs[AbstractDungeon.cardRandomRng.random(len(orbs) - 1)]
-        else:
-            return orbs[math.random(len(orbs) - 1)]
 
     def onStartOfTurn(self):
         pass
@@ -51,10 +44,10 @@ class AbstractOrb:
 
     # 瞄准靶心，追踪锁定效果
     def applyLockOn(target, dmg):
-        retVal = dmg
+        ret_val = dmg
         if hasattr(target, "hasPower") and target.hasPower("Lockon"):
-            retVal = int(dmg * 1.5)
-        return retVal
+            ret_val = int(float(dmg) * 1.5)
+        return ret_val
 
     def makeCopy(self):
         raise NotImplementedError
@@ -64,4 +57,16 @@ class AbstractOrb:
 
 
 
+from .Lightning import Lightning
+from .Dark import Dark
+from .Frost import Frost
+from .Plasma import Plasma
+
+
+def getRandomOrb(useCardRng):
+    orbs = [Dark(), Frost(), Lightning(), Plasma()]
+    if useCardRng:
+        return orbs[AbstractDungeon.cardRandomRng.random(len(orbs) - 1)]
+    else:
+        return orbs[MathUtils.randomInt(len(orbs) - 1)]
 
