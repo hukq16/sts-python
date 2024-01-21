@@ -92,7 +92,7 @@ namespace sts
 
         std::int64_t seed0;
         std::int64_t seed1;
-
+        std::int64_t random_number;
         RandomXS128()
         {
             // setSeed((new java::Random())->nextInt());
@@ -103,7 +103,7 @@ namespace sts
             std::uniform_int_distribution<std::int64_t> distribution(LLONG_MIN, LLONG_MAX);
 
             // 生成随机数
-            std::int64_t random_number = distribution(generator);
+            random_number = distribution(generator);
 
             setSeed(random_number);
         }
@@ -212,7 +212,7 @@ namespace sts
 
         void nextBytes(std::vector<unsigned char> &bytes)
         {
-            int i = bytes.size();
+            int i = static_cast<int>(bytes.size());
 
             while (i != 0)
             {
