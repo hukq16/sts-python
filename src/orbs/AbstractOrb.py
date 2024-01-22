@@ -2,12 +2,12 @@
 
 
 from ..badlogic.math.MathUtils import MathUtils
-
+from ..dungeons.AbstractDungeon import AbstractDungeon
 from ..core import GlobalVar
 
 
 
-AbstractDungeon = GlobalVar.get_value("abstractdungeon")
+
 class AbstractOrb:
 
     def __init__(self):

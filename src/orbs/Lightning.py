@@ -3,6 +3,9 @@
 import math
 import random
 from .AbstractOrb import AbstractOrb
+from ..dungeons.AbstractDungeon import AbstractDungeon
+from ..cards.DamageInfo import DamageInfo
+from ..actions.defect.LightningOrbEvokeAction import LightningOrbEvokeAction
 
 
 class Lightning(AbstractOrb):
@@ -18,7 +21,18 @@ class Lightning(AbstractOrb):
 
     def onEvoke(self):
         # 实现激发效果
-        
+        if AbstractDungeon.player.hasPower("Electro"):
+            AbstractDungeon.actionManager.addToTop(
+                LightningOrbEvokeAction(
+                    DamageInfo(AbstractDungeon.player, self.evokeAmount, DamageInfo.DamageType.THORNS),
+                    True))
+        else:
+            AbstractDungeon.actionManager.addToTop(
+                LightningOrbEvokeAction(
+                    DamageInfo(AbstractDungeon.player,
+                               self.evokeAmount,
+                               DamageInfo.DamageType.THORNS),
+                    False))
         pass
 
     def onEndOfTurn(self):
