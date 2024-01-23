@@ -127,3 +127,13 @@ class AbstractPlayer(AbstractCreature):
         # while i < len(self._points):
         #     self._points[i] = com.badlogic.gdx.math.Vector2()
         #     i += 1
+
+    def hasBlight(self, targetID:str) -> bool:
+        for p in self.blights:
+            if p.ID == targetID:
+                return True
+
+    def getBlight(self, targetID:str) -> AbstractBlight:
+        for p in self.blights:
+            if p.ID == targetID:
+                return p

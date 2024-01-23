@@ -1,52 +1,47 @@
+# finished
 from enum import Enum
 from ..dungeons.AbstractDungeon import AbstractDungeon
+from ..cards.DamageInfo import DamageInfo
+from ..core.AbstractCreature import AbstractCreature
+
 
 class AbstractGameAction:
-    DEFAULT_DURATION = 0.5
+    # DEFAULT_DURATION = 0.5
+    # duration: float = 0
+    # startDuration: float = 0
+    damageType: DamageInfo.DamageType = None
+    isDone: bool = False
+    amount: int = 0
+    target: AbstractCreature = None
+    source: AbstractCreature = None
 
     def __init__(self):
-        #instance fields found by Java to Python Converter:
-        self.duration = 0
-        self.startDuration = 0
-        self.actionType = 0
-        self.attackEffect = 0
-        self.damageType = 0
-        self.isDone = False
-        self.amount = 0
-        self.target = None
-        self.source = None
-
-        self.attackEffect = AbstractGameAction.AttackEffect.NONE
         self.isDone = False
 
-#JAVA TO PYTHON CONVERTER TASK: Python does not allow method overloads:
-    def setValues(self, target, info):
-        self.target = target
-        self.source = info.owner
-        self.amount = info.output
-        self.duration = 0.5
+    def setValues(self, target: AbstractCreature, source: AbstractCreature, amount: int = None,
+                  info: DamageInfo = None):
+        if amount is None and info is not None:
+            self.target = target
+            self.source = info.owner
+            self.amount = info.output
+            # self.duration = 0.5
+        elif amount is not None and info is None:
+            self.target = target
+            self.source = source
+            self.amount = amount
+            # self.duration = 0.5
+        elif amount is None and info is None:
+            self.target = target
+            self.source = source
+            self.amount = 0
+            # self.duration = 0.5
 
-#JAVA TO PYTHON CONVERTER TASK: Python does not allow method overloads:
-    def setValues(self, target, source, amount):
-        self.target = target
-        self.source = source
-        self.amount = amount
-        self.duration = 0.5
-
-#JAVA TO PYTHON CONVERTER TASK: Python does not allow method overloads:
-    def setValues(self, target, source):
-        self.target = target
-        self.source = source
-        self.amount = 0
-        self.duration = 0.5
-
-    def isDeadOrEscaped(self, target):
+    def isDeadOrEscaped(self, target:AbstractCreature) -> bool:
         if (not target.isDying) and not target.halfDead:
             if not target.isPlayer:
                 m = target
                 if m.isEscaping:
                     return True
-
             return False
         else:
             return True
@@ -58,13 +53,12 @@ class AbstractGameAction:
         AbstractDungeon.actionManager.addToTop(action)
 
     def update(self):
-        pass
+        raise NotImplementedError
 
-    def tickDuration(self):
-        self.duration -= com.badlogic.gdx.Gdx.graphics.getDeltaTime()
-        if self.duration < 0.0:
-            self.isDone = True
-
+    # def tickDuration(self):
+    #     self.duration -= getDeltaTime()
+    #     if self.duration < 0.0:
+    #         self.isDone = True
 
     def shouldCancelAction(self):
         return self.target is None or self.source is not None and self.source.isDying or self.target.isDeadOrEscaped()
@@ -89,6 +83,9 @@ class AbstractGameAction:
         SHUFFLE = 16
         REDUCE_POWER = 17
 
+        def __int__(self):
+            return self.value
+
     class AttackEffect(Enum):
         BLUNT_LIGHT = 0
         BLUNT_HEAVY = 1
@@ -102,3 +99,5 @@ class AbstractGameAction:
         POISON = 9
         SHIELD = 10
         LIGHTNING = 11
+        def __int__(self):
+            return self.value

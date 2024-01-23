@@ -47,3 +47,8 @@ class GameActionManager:
             self.actions.append(action)
         pass
 
+    def clearPostCombatActions(self):
+        for idx,i in self.actions:
+            if isinstance(i,()):
+                self.actions.remove(idx)
+

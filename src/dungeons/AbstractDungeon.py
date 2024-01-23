@@ -132,3 +132,9 @@ class AbstractDungeon:
     @classmethod
     def getRandomMonster(cls):
         pass
+
+    @classmethod
+    def getMonsters(cls):
+        pass
+    
+    

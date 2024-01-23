@@ -7,14 +7,14 @@ class MathUtils:
         self.mathrandom=RandomXS128()
 
 
-    def randomInt(self, range:int):
-        return self.mathrandom.nextInt(range+1)
+    def randomInt(self, range:int,end:int = None):
+        if end is None:
+            return self.mathrandom.nextInt(range+1)
+        else:
+            return range + self.mathrandom.nextInt(end - range + 1)
 
-    def randomInt(self,start:int,end:int):
-        return start + self.mathrandom.nextInt(end-start +1)
-
-    def randomLong(self ,range:int):
-        return int(self.mathrandom.nextDouble() * range)
-
-    def randomLong(self,start:int,end:int):
-        return start + int(self.mathrandom.nextDouble() * float(end - start))
+    def randomLong(self ,range:int,end:int = None):
+        if end is None:
+            return int(self.mathrandom.nextDouble() * range)
+        else:
+            return range + int(self.mathrandom.nextDouble() * float(end - range))

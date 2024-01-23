@@ -9,6 +9,7 @@ from ...actions.common.DamageAction import DamageAction
 class LightningOrbEvokeAction(AbstractGameAction):
 
     def __init__(self, info: DamageInfo, hitAll: bool):
+        super().__init__()
         self.info = info
         self.actionType = AbstractGameAction.ActionType.DAMAGE
         self.hitAll = hitAll
