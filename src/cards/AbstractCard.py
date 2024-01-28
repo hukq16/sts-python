@@ -1,0 +1,2 @@
+class AbstractCard:
+    name = None

@@ -36,7 +36,7 @@ class AbstractGameAction:
             self.amount = 0
             # self.duration = 0.5
 
-    def isDeadOrEscaped(self, target:AbstractCreature) -> bool:
+    def isDeadOrEscaped(self, target: AbstractCreature) -> bool:
         if (not target.isDying) and not target.halfDead:
             if not target.isPlayer:
                 m = target
@@ -99,5 +99,6 @@ class AbstractGameAction:
         POISON = 9
         SHIELD = 10
         LIGHTNING = 11
+
         def __int__(self):
             return self.value

@@ -1,73 +1,142 @@
-
 from ..core.AbstractCreature import AbstractCreature
 from ..dungeons.AbstractDungeon import AbstractDungeon
+from enum import Enum
+from ..cards.CardGroup import CardGroup
+from ..relics.AbstractRelic import AbstractRelic
+from ..blights import AbstractBlight
+class PlayerClass(Enum):
+    IRONCLAD = 0
+    THE_SILENT = 1
+    DEFECT = 2
+    WATCHER = 3
+
+
+class RHoverType(Enum):
+    RELIC = 0
+    BLIGHT = 1
+
+
 class AbstractPlayer(AbstractCreature):
-    MSG = None
-    LABEL = None
-    poisonKillCount = 0
-    customMods = None
-    HOVER_CARD_Y_POSITION = 0
+    chosenClass: PlayerClass = None
+    gameHandSize: int = None
+
+    masterHandSize: int = None
+    startingMaxHP: int = None
+    masterDeck: CardGroup = None
+    drawPile: CardGroup = None
+    hand: CardGroup = None
+    discardPile: CardGroup = None
+    exhaustPile: CardGroup = None
+    limbo: CardGroup = None
+    relics: [AbstractRelic] = None
+    blights: [AbstractBlight] = None
+    potionSlots:int = None
+    potions:[AbstractRelic] = None
+    energy = None
+    isEndingTurn = False
+    viewingRelics = False
+    inspectMode = False
+    inspectHb = None
+    damagedThisCombat = 0
+    title = None
+    orbs = None
+    masterMaxOrbs = 0
+    maxOrbs = 0
+    stance = None
+    cardsPlayedThisTurn = 0
+    _isHoveringCard = False
+    isHoveringDropZone = False
+    _hoverStartLine = 0
+    _passedHesitationLine = False
+    hoveredCard = None
+    toHover = None
+    cardInUse = None
+    isDraggingCard = False
+    _isUsingClickDragControl = False
+    _clickDragTimer = 0
+    inSingleTargetMode = False
+    _hoveredMonster = None
+    hoverEnemyWaitTimer = 0
+    isInKeyboardMode = False
+    _skipMouseModeOnce = False
+    _keyboardCardIndex = 0
+    _touchscreenInspectCount = 0
+    img = None
+    shoulderImg = None
+    shoulder2Img = None
+    corpseImg = None
+    _arrowScale = 0
+    _arrowScaleTimer = 0
+    _arrowX = 0
+    _arrowY = 0
+    endTurnQueued = False
+    _points = None
+    _controlPoint = None
+    _arrowTmp = None
+    _startArrowVector = None
+    _endArrowVector = None
+    _renderCorpse = False
 
     def __init__(self, name, setClass):
-        #instance fields found by Java to Python Converter:
-        self.chosenClass = 0
-        self.gameHandSize = 0
-        self.masterHandSize = 0
-        self.startingMaxHP = 0
-        self.masterDeck = None
-        self.drawPile = None
-        self.hand = None
-        self.discardPile = None
-        self.exhaustPile = None
-        self.limbo = None
-        self.relics = None
-        self.blights = None
-        self.potionSlots = 0
-        self.potions = None
-        self.energy = None
-        self.isEndingTurn = False
-        self.viewingRelics = False
-        self.inspectMode = False
-        self.inspectHb = None
-        self.damagedThisCombat = 0
-        self.title = None
-        self.orbs = None
-        self.masterMaxOrbs = 0
-        self.maxOrbs = 0
-        self.stance = None
-        self.cardsPlayedThisTurn = 0
-        self._isHoveringCard = False
-        self.isHoveringDropZone = False
-        self._hoverStartLine = 0
-        self._passedHesitationLine = False
-        self.hoveredCard = None
-        self.toHover = None
-        self.cardInUse = None
-        self.isDraggingCard = False
-        self._isUsingClickDragControl = False
-        self._clickDragTimer = 0
-        self.inSingleTargetMode = False
-        self._hoveredMonster = None
-        self.hoverEnemyWaitTimer = 0
-        self.isInKeyboardMode = False
-        self._skipMouseModeOnce = False
-        self._keyboardCardIndex = 0
-        self._touchscreenInspectCount = 0
-        self.img = None
-        self.shoulderImg = None
-        self.shoulder2Img = None
-        self.corpseImg = None
-        self._arrowScale = 0
-        self._arrowScaleTimer = 0
-        self._arrowX = 0
-        self._arrowY = 0
-        self.endTurnQueued = False
-        self._points = None
-        self._controlPoint = None
-        self._arrowTmp = None
-        self._startArrowVector = None
-        self._endArrowVector = None
-        self._renderCorpse = False
+        super().__init__()
+        chosenClass = 0
+        gameHandSize = 0
+        masterHandSize = 0
+        startingMaxHP = 0
+        masterDeck = None
+        drawPile = None
+        hand = None
+        discardPile = None
+        exhaustPile = None
+        limbo = None
+        relics = None
+        blights = None
+        potionSlots = 0
+        potions = None
+        energy = None
+        isEndingTurn = False
+        viewingRelics = False
+        inspectMode = False
+        inspectHb = None
+        damagedThisCombat = 0
+        title = None
+        orbs = None
+        masterMaxOrbs = 0
+        maxOrbs = 0
+        stance = None
+        cardsPlayedThisTurn = 0
+        _isHoveringCard = False
+        isHoveringDropZone = False
+        _hoverStartLine = 0
+        _passedHesitationLine = False
+        hoveredCard = None
+        toHover = None
+        cardInUse = None
+        isDraggingCard = False
+        _isUsingClickDragControl = False
+        _clickDragTimer = 0
+        inSingleTargetMode = False
+        _hoveredMonster = None
+        hoverEnemyWaitTimer = 0
+        isInKeyboardMode = False
+        _skipMouseModeOnce = False
+        _keyboardCardIndex = 0
+        _touchscreenInspectCount = 0
+        img = None
+        shoulderImg = None
+        shoulder2Img = None
+        corpseImg = None
+        _arrowScale = 0
+        _arrowScaleTimer = 0
+        _arrowX = 0
+        _arrowY = 0
+        endTurnQueued = False
+        _points = None
+        _controlPoint = None
+        _arrowTmp = None
+        _startArrowVector = None
+        _endArrowVector = None
+        _renderCorpse = False
 
         # self.masterDeck = com.megacrit.cardcrawl.cards.CardGroup(com.megacrit.cardcrawl.cards.CardGroup.CardGroupType.MASTER_DECK)
         # self.drawPile = com.megacrit.cardcrawl.cards.CardGroup(com.megacrit.cardcrawl.cards.CardGroup.CardGroupType.DRAW_PILE)
@@ -75,45 +144,44 @@ class AbstractPlayer(AbstractCreature):
         # self.discardPile = com.megacrit.cardcrawl.cards.CardGroup(com.megacrit.cardcrawl.cards.CardGroup.CardGroupType.DISCARD_PILE)
         # self.exhaustPile = com.megacrit.cardcrawl.cards.CardGroup(com.megacrit.cardcrawl.cards.CardGroup.CardGroupType.EXHAUST_PILE)
         # self.limbo = com.megacrit.cardcrawl.cards.CardGroup(com.megacrit.cardcrawl.cards.CardGroup.CardGroupType.UNSPECIFIED)
-        self.relics = []
-        self.blights = []
-        self.potionSlots = 3
-        self.potions = []
-        self.isEndingTurn = False
-        self.viewingRelics = False
-        self.inspectMode = False
-        self.inspectHb = None
-        self.damagedThisCombat = 0
-        self.orbs = []
+        relics = []
+        blights = []
+        potionSlots = 3
+        potions = []
+        isEndingTurn = False
+        viewingRelics = False
+        inspectMode = False
+        inspectHb = None
+        damagedThisCombat = 0
+        orbs = []
         # self.stance = com.megacrit.cardcrawl.stances.NeutralStance()
-        self.cardsPlayedThisTurn = 0
-        self._isHoveringCard = False
-        self.isHoveringDropZone = False
+        cardsPlayedThisTurn = 0
+        _isHoveringCard = False
+        isHoveringDropZone = False
 
+        hoveredCard = None
+        toHover = None
+        cardInUse = None
+        isDraggingCard = False
+        _isUsingClickDragControl = False
+        inSingleTargetMode = False
+        _hoveredMonster = None
+        isInKeyboardMode = False
+        _skipMouseModeOnce = False
+        _keyboardCardIndex = -1
+        _touchscreenInspectCount = 0
+        endTurnQueued = False
 
-        self.hoveredCard = None
-        self.toHover = None
-        self.cardInUse = None
-        self.isDraggingCard = False
-        self._isUsingClickDragControl = False
-        self.inSingleTargetMode = False
-        self._hoveredMonster = None
-        self.isInKeyboardMode = False
-        self._skipMouseModeOnce = False
-        self._keyboardCardIndex = -1
-        self._touchscreenInspectCount = 0
-        self.endTurnQueued = False
-
-        self._renderCorpse = False
-        self.name = name
+        _renderCorpse = False
+        name = name
         # self.title = self.getTitle(setClass)
 
         # self.chosenClass = setClass
-        self.isPlayer = True
+        isPlayer = True
         # self.initializeStarterRelics(setClass)
         # self.loadPrefs()
         if AbstractDungeon.ascensionLevel >= 11:
-            self.potionSlots -= 1
+            potionSlots -= 1
         #
         # self.potions.clear()
 
@@ -128,12 +196,12 @@ class AbstractPlayer(AbstractCreature):
         #     self._points[i] = com.badlogic.gdx.math.Vector2()
         #     i += 1
 
-    def hasBlight(self, targetID:str) -> bool:
-        for p in self.blights:
+    def hasBlight(self, targetID: str) -> bool:
+        for p in blights:
             if p.ID == targetID:
                 return True
 
-    def getBlight(self, targetID:str) -> AbstractBlight:
-        for p in self.blights:
+    def getBlight(self, targetID: str) -> AbstractBlight:
+        for p in blights:
             if p.ID == targetID:
                 return p

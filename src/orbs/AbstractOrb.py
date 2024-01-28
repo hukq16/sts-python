@@ -1,11 +1,6 @@
-
-
-
+# finished
 from ..badlogic.math.MathUtils import MathUtils
 from ..dungeons.AbstractDungeon import AbstractDungeon
-from ..core import GlobalVar
-
-
 
 
 class AbstractOrb:
@@ -18,13 +13,8 @@ class AbstractOrb:
         self.baseEvokeAmount = 0
         self.basePassiveAmount = 0
 
-
-
-
-
     def onEvoke(self):
         raise NotImplementedError
-
 
     def onStartOfTurn(self):
         pass
@@ -56,7 +46,6 @@ class AbstractOrb:
         pass
 
 
-
 from .Lightning import Lightning
 from .Dark import Dark
 from .Frost import Frost
@@ -69,4 +58,3 @@ def getRandomOrb(useCardRng):
         return orbs[AbstractDungeon.cardRandomRng.random(len(orbs) - 1)]
     else:
         return orbs[MathUtils.randomInt(len(orbs) - 1)]
-

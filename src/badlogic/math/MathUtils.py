@@ -3,8 +3,8 @@ from sts_random import JavaRandom,RandomXS128,stsRandom
 
 
 class MathUtils:
-    def __init__(self):
-        self.mathrandom=RandomXS128()
+
+    mathrandom=RandomXS128()
 
 
     def randomInt(self, range:int,end:int = None):
