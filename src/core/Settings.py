@@ -57,7 +57,7 @@ class Settings:
     VERT_LETTERBOX_AMT = 0
     displayOptions = None
     displayIndex = 0
-    scale = 0
+    scale:float = 1.0
     renderScale = 0
     xScale = 0
     yScale = 0

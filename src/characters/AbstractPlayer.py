@@ -205,3 +205,6 @@ class AbstractPlayer(AbstractCreature):
         for p in blights:
             if p.ID == targetID:
                 return p
+
+    def hasRelic(self, param):
+        pass

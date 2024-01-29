@@ -1,4 +1,4 @@
-# finished
+# nearly finished
 from enum import Enum
 from ..dungeons.AbstractDungeon import AbstractDungeon
 from ..cards.DamageInfo import DamageInfo
