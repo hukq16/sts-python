@@ -2,8 +2,11 @@ from enum import Enum
 from uuid import UUID, uuid4
 from .DamageInfo import DamageInfo
 from .DescriptionLine import DescriptionLine
-from ..dungeons.AbstractDungeon import AbstractDungeon
+from ..dungeons import AbstractDungeon
 from ..core.Settings import Settings
+
+from ..rooms.AbstractRoom import AbstractRoom
+import math
 
 
 class CardTags(Enum):
@@ -62,6 +65,15 @@ class CardTarget(Enum):
 
     def __int__(self):
         return self.value
+
+
+def compare_to(str1: str, str2: str):
+    if str1 < str2:
+        return -1
+    elif str1 > str2:
+        return 1
+    else:
+        return 0
 
 
 class AbstractCard:
@@ -380,40 +392,40 @@ class AbstractCard:
 
     def cardPlayable(self, m):
         if (self.target != CardTarget.ENEMY and self.target != CardTarget.SELF_AND_ENEMY or m is None or (
-                not m.isDying)) and not AbstractDungeon.getMonsters().areMonstersBasicallyDead():
+                not m.isDying)) and not AbstractDungeon.AbstractDungeon.getMonsters().areMonstersBasicallyDead():
             return True
         else:
             self.cantUseMessage = None
             return False
 
     def hasEnoughEnergy(self):
-        if AbstractDungeon.actionManager.turnHasEnded:
-            self.cantUseMessage = self.TEXT[9]
+        if AbstractDungeon.AbstractDungeon.actionManager.turnHasEnded:
+            # self.cantUseMessage = self.TEXT[9]
             return False
         else:
-            for p in AbstractDungeon.player.powers:
+            for p in AbstractDungeon.AbstractDungeon.player.powers:
                 if not p.canPlayCard(self):
-                    self.cantUseMessage = self.TEXT[13]
+                    # self.cantUseMessage = self.TEXT[13]
                     return False
 
-            if AbstractDungeon.player.hasPower("Entangled") and self.card_type == CardType.ATTACK:
-                self.cantUseMessage = self.TEXT[10]
+            if AbstractDungeon.AbstractDungeon.player.hasPower("Entangled") and self.card_type == CardType.ATTACK:
+                # self.cantUseMessage = self.TEXT[10]
                 return False
 
-            for r in AbstractDungeon.player.relics:
+            for r in AbstractDungeon.AbstractDungeon.player.relics:
                 if not r.canPlay(self):
                     return False
 
-            for b in AbstractDungeon.player.blights:
+            for b in AbstractDungeon.AbstractDungeon.player.blights:
                 if not b.canPlay(self):
                     return False
 
-            for c in AbstractDungeon.player.hand.group:
+            for c in AbstractDungeon.AbstractDungeon.player.hand.group:
                 if not c.canPlay(self):
                     return False
 
             if EnergyPanel.totalCount < self.costForTurn and not self.freeToPlay() and not self.isInAutoplay:
-                self.cantUseMessage = self.TEXT[11]
+                # self.cantUseMessage = self.TEXT[11]
                 return False
 
             return True
@@ -437,10 +449,10 @@ class AbstractCard:
         return True
 
     def canUse(self, p, m):
-        if self.card_type == CardType.STATUS and self.costForTurn < -1 and not AbstractDungeon.player.hasRelic(
+        if self.card_type == CardType.STATUS and self.costForTurn < -1 and not AbstractDungeon.AbstractDungeon.player.hasRelic(
                 "Medical Kit"):
             return False
-        elif self.card_type == CardType.CURSE and self.costForTurn < -1 and not AbstractDungeon.player.hasRelic(
+        elif self.card_type == CardType.CURSE and self.costForTurn < -1 and not AbstractDungeon.AbstractDungeon.player.hasRelic(
                 "Blue Candle"):
             return False
         else:
@@ -449,7 +461,331 @@ class AbstractCard:
     def use(self, var1, var2):
         raise NotImplementedError
 
+    def getPrice(rarity):
+        if rarity == CardRarity.BASIC:
+            return 9999
+        elif rarity == CardRarity.SPECIAL:
+            return 9999
+        elif rarity == CardRarity.COMMON:
+            return 50
+        elif rarity == CardRarity.UNCOMMON:
+            return 75
+        elif rarity == CardRarity.RARE:
+            return 150
+        else:
+            return 0
 
+    def updateCost(self, amt: int):
+        if self.color == CardColor.CURSE and (
+                self.cardID != "Pride") or self.card_type == CardType.STATUS and self.cardID != "Slimed":
+            pass
+        else:
+            tmpCost = self.cost
+            diff = self.cost - self.costForTurn
+            tmpCost += amt
+            if tmpCost < 0:
+                tmpCost = 0
+
+            if tmpCost != self.cost:
+                self.isCostModified = True
+                self.cost = tmpCost
+                self.costForTurn = self.cost - diff
+                if self.costForTurn < 0:
+                    self.costForTurn = 0
+
+    def setCostForTurn(self, amt: int):
+        if self.costForTurn >= 0:
+            self.costForTurn = amt
+            if self.costForTurn < 0:
+                self.costForTurn = 0
+
+            if self.costForTurn != self.cost:
+                self.isCostModifiedForTurn = True
+
+    def modifyCostForCombat(self, amt: int):
+        if self.costForTurn > 0:
+            self.costForTurn += amt
+            if self.costForTurn < 0:
+                self.costForTurn = 0
+
+            if self.cost != self.costForTurn:
+                self.isCostModified = True
+
+            self.cost = self.costForTurn
+        elif self.cost >= 0:
+            self.cost += amt
+            if self.cost < 0:
+                self.cost = 0
+
+            self.costForTurn = 0
+            if self.cost != self.costForTurn:
+                self.isCostModified = True
+
+    def resetAttributes(self):
+        self.block = self.baseBlock
+        self.isBlockModified = False
+        self.damage = self.baseDamage
+        self.isDamageModified = False
+        self.magicNumber = self.baseMagicNumber
+        self.isMagicNumberModified = False
+        self.damageTypeForTurn = self.damageType
+        self.costForTurn = self.cost
+        self.isCostModifiedForTurn = False
+
+    def getCost(self) -> str:
+        if self.cost == -1:
+            return "X"
+        else:
+            return "0" if self.freeToPlay() else str(self.costForTurn)
+
+    def freeToPlay(self):
+        if self.freeToPlayOnce:
+            return True
+        else:
+            return AbstractDungeon.AbstractDungeon.player is not None and AbstractDungeon.AbstractDungeon.currMapNode is not None and AbstractDungeon.AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT and AbstractDungeon.AbstractDungeon.player.hasPower(
+                "FreeAttackPower") and self.card_type == CardType.ATTACK
+
+    def onMoveToDiscard(self):
+        pass
+
+    def triggerWhenDrawn(self):
+        pass
+
+    def triggerWhenCopied(self):
+        pass
+
+    def triggerOnEndOfPlayerTurn(self):
+        if self.isEthereal:
+            self.addToTop(ExhaustSpecificCardAction(self, AbstractDungeon.AbstractDungeon.player.hand))
+
+    def triggerOnEndOfTurnForPlayingCard(self):
+        pass
+
+    def triggerOnOtherCardPlayed(self, c):
+        pass
+
+    def triggerOnGainEnergy(self, e: int, dueToCard: bool):
+        pass
+
+    def triggerOnManualDiscard(self):
+        pass
+
+    def triggerOnCardPlayed(self, cardPlayed):
+        pass
+
+    def triggerOnScry(self):
+        pass
+
+    def triggerExhaustedCardsOnStanceChange(self, newStance):
+        pass
+
+    def triggerAtStartOfTurn(self):
+        pass
+
+    def onPlayCard(self, c, m):
+        pass
+
+    def atTurnStart(self):
+        pass
+
+    def atTurnStartPreDraw(self):
+        pass
+
+    def onChoseThisOption(self):
+        pass
+
+    def onRetained(self):
+        pass
+
+    def triggerOnExhaust(self):
+        pass
+
+    def applyPowers(self):
+        self.applyPowersToBlock()
+        player = AbstractDungeon.AbstractDungeon.player
+        self.isDamageModified = False
+        if not self.isMultiDamage:
+            tmp = float(self.baseDamage)
+
+            for r in player.relics:
+                tmp = r.at_damage_modify(tmp, self)
+                if self.baseDamage != int(tmp):
+                    self.isDamageModified = True
+
+            for p in player.powers:
+                tmp = p.atDamageGive(tmp, self.damageTypeForTurn, self)
+
+            tmp = player.stance.atDamageGive(tmp, self.damageTypeForTurn, self)
+            if self.baseDamage != int(tmp):
+                self.isDamageModified = True
+
+            for p in player.powers:
+                tmp = p.atDamageFinalGive(tmp, self.damageTypeForTurn, self)
+
+            tmp = max(0.0, tmp)
+
+            if self.baseDamage != math.floor(tmp):
+                self.isDamageModified = True
+
+            self.damage = math.floor(tmp)
+
+        else:
+            m = AbstractDungeon.AbstractDungeon.getCurrRoom().monsters.monsters
+
+            tmp = [float(self.baseDamage) for _ in m]
+
+            for i in range(len(tmp)):
+                for r in player.relics:
+                    tmp[i] = r.atDamageModify(tmp[i], self)
+                    if self.baseDamage != int(tmp[i]):
+                        self.isDamageModified = True
+
+                for p in player.powers:
+                    tmp[i] = p.atDamageGive(tmp[i], self.damageTypeForTurn, self)
+
+                tmp[i] = player.stance.atDamageGive(tmp[i], self.damageTypeForTurn, self)
+                if self.baseDamage != int(tmp[i]):
+                    self.isDamageModified = True
+
+            for i in range(len(tmp)):
+                for p in player.powers:
+                    tmp[i] = p.atDamageFinalGive(tmp[i], self.damageTypeForTurn, self)
+
+                tmp[i] = max(0.0, tmp[i])
+
+            self.multiDamage = [math.floor(dmg) for dmg in tmp]
+
+            for i in range(len(tmp)):
+                if self.baseDamage != int(tmp[i]):
+                    self.isDamageModified = True
+
+            self.damage = self.multiDamage[0]
+
+    def applyPowersToBlock(self):
+        self.isBlockModified = False
+        tmp = float(self.baseBlock)
+
+        for p in AbstractDungeon.AbstractDungeon.player.powers:
+            tmp = p.modifyBlock(tmp, self)
+
+        for p in AbstractDungeon.AbstractDungeon.player.powers:
+            tmp = p.modifyBlockLast(tmp)
+
+        if self.baseBlock != math.floor(tmp):
+            self.isBlockModified = True
+
+        tmp = max(0.0, tmp)
+
+        self.block = math.floor(tmp)
+
+    def calculateDamageDisplay(self, mo):
+        self.calculateCardDamage(mo)
+
+    def calculateCardDamage(self, mo):
+        self.applyPowersToBlock()
+        player = AbstractDungeon.AbstractDungeon.player
+        self.isDamageModified = False
+
+        if not self.isMultiDamage and mo is not None:
+            tmp = float(self.baseDamage)
+
+            for r in player.relics:
+                tmp = r.atDamageModify(tmp, self)
+                if self.baseDamage != int(tmp):
+                    self.isDamageModified = True
+
+            # Applying power modifications
+            for p in player.powers:
+                tmp = p.atDamageGive(tmp, self.damageTypeForTurn, self)
+
+            tmp = player.stance.at_damage_give(tmp, self.damageTypeForTurn, self)
+            if self.baseDamage != int(tmp):
+                self.isDamageModified = True
+
+            # Applying monster power modifications for damage received
+            for p in mo.powers:
+                tmp = p.atDamageReceive(tmp, self.damageTypeForTurn, self)
+
+            # Final damage modifications from player
+            for p in player.powers:
+                tmp = p.atDamageFinalGive(tmp, self.damageTypeForTurn, self)
+
+            # Final damage modifications from monster
+            for p in mo.powers:
+                tmp = p.atDamageFinalReceive(tmp, self.damageTypeForTurn, self)
+
+            tmp = max(0.0, tmp)
+
+            if self.baseDamage != math.floor(tmp):
+                self.isDamageModified = True
+
+            self.damage = math.floor(tmp)
+
+        else:
+            m = AbstractDungeon.AbstractDungeon.getCurrRoom().monsters.monsters
+            tmp = [float(self.baseDamage) for _ in m]
+
+            # Calculating damage for each monster
+            for i in range(len(tmp)):
+                # Relic and power modifications
+                for r in player.relics:
+                    tmp[i] = r.atDamageModify(tmp[i], self)
+                    if self.baseDamage != int(tmp[i]):
+                        self.isDamageModified = True
+
+                for p in player.powers:
+                    tmp[i] = p.atDamageGive(tmp[i], self.damageTypeForTurn, self)
+
+                tmp[i] = player.stance.at_damage_give(tmp[i], self.damageTypeForTurn, self)
+                if self.baseDamage != int(tmp[i]):
+                    self.isDamageModified = True
+
+                # Monster-specific power adjustments
+                for p in m[i].powers:
+                    if not m[i].isDying and not m[i].isEscaping:
+                        tmp[i] = p.atDamageReceive(tmp[i], self.damageTypeForTurn, self)
+
+                for p in player.powers:
+                    tmp[i] = p.atDamageFinalGive(tmp[i], self.damageTypeForTurn, self)
+
+                for p in m[i].powers:
+                    if not m[i].isDying and not m[i].isEscaping:
+                        tmp[i] = p.atDamageFinalReceive(tmp[i], self.damageTypeForTurn, self)
+
+                tmp[i] = max(0.0, tmp[i])
+
+            self.multiDamage = [math.floor(dmg) for dmg in tmp]
+
+            for i in range(len(tmp)):
+                if self.baseDamage != int(tmp[i]):
+                    self.isDamageModified = True
+
+            self.damage = self.multiDamage[0]
+
+    def clearPowers(self):
+        self.resetAttributes()
+        self.isDamageModified = False
+
+    def addToBot(self, action):
+        AbstractDungeon.AbstractDungeon.actionManager.addToBottom(action)
+
+    def addToTop(self, action):
+        AbstractDungeon.AbstractDungeon.actionManager.addToTop(action)
+
+    def toString(self):
+        return self.name
+
+    def compareTo(self, other):
+        return compare_to(self.cardID, other.cardID)
+
+    def getMetricID(self):
+        id_in = self.cardID
+        if self.upgraded:
+            id_in = id_in + "+"
+            if self.timesUpgraded > 0:
+                id_in = id_in + str(self.timesUpgraded)
+
+        return id_in
 
     def triggerOnGlowCheck(self):
         pass

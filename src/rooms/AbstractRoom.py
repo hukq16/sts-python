@@ -18,6 +18,7 @@ class RoomPhase(Enum):
     INCOMPLETE = 3
 
 class AbstractRoom():
+    RoomPhase = None
     _uiStrings = None
     TEXT = None
     _logger = None
