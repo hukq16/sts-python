@@ -1,6 +1,5 @@
 # finished
 from ..badlogic.math.MathUtils import MathUtils
-from ..dungeons.AbstractDungeon import AbstractDungeon
 
 
 class AbstractOrb:
@@ -24,6 +23,7 @@ class AbstractOrb:
 
     # 集中
     def applyFocus(self):
+        from ..dungeons.AbstractDungeon import AbstractDungeon
         power = AbstractDungeon.player.getPower("Focus")
         if power is not None and self.ID != "Plasma":
             self.passiveAmount = max(0, self.basePassiveAmount + power.amount)
@@ -46,13 +46,12 @@ class AbstractOrb:
         pass
 
 
-from .Lightning import Lightning
-from .Dark import Dark
-from .Frost import Frost
-from .Plasma import Plasma
-
-
 def getRandomOrb(useCardRng):
+    from ..dungeons.AbstractDungeon import AbstractDungeon
+    from .Lightning import Lightning
+    from .Dark import Dark
+    from .Frost import Frost
+    from .Plasma import Plasma
     orbs = [Dark(), Frost(), Lightning(), Plasma()]
     if useCardRng:
         return orbs[AbstractDungeon.cardRandomRng.random(len(orbs) - 1)]

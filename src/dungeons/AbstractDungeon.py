@@ -10,7 +10,7 @@ class AbstractDungeon:
     id = None
     floorNum = 0
     actNum = 0
-    player: AbstractPlayer = None
+    player = None
     unlocks = None
     shrineChance = 0
     cardUpgradedChance = 0
