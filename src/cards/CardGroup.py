@@ -10,11 +10,7 @@ class CardGroup:
         self._queued = None
         self._inHand = None
 
-    _LOGGER = org.apache.logging.log4j.LogManager.getLogger(CardGroup.__name__)
-    _HAND_HOVER_PUSH_AMT = 0.4F
-    _PUSH_TAPER = 0.25F
-    _TWO_CARD_PUSH_AMT = 0.2F
-    _THREE_FOUR_CARD_PUSH_AMT = 0.27F
+
     DRAW_PILE_X = 0
     DRAW_PILE_Y = 0
     DISCARD_PILE_X = 0
@@ -25,8 +21,6 @@ class CardGroup:
     def __init__(self, type):
         self._initialize_instance_fields()
 
-        self.HAND_START_X = float(com.megacrit.cardcrawl.core.Settings.WIDTH) * 0.36F
-        self.HAND_OFFSET_X = AbstractCard.IMG_WIDTH * 0.35F
         self.handPositioningMap = {}
         self._queued = []
         self._inHand = []
@@ -37,8 +31,6 @@ class CardGroup:
     def __init__(self, g, type):
         self._initialize_instance_fields()
 
-        self.HAND_START_X = float(com.megacrit.cardcrawl.core.Settings.WIDTH) * 0.36F
-        self.HAND_OFFSET_X = AbstractCard.IMG_WIDTH * 0.35F
         self.handPositioningMap = {}
         self._queued = []
         self._inHand = []

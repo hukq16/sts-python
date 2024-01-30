@@ -1,6 +1,6 @@
 # finished
 from enum import Enum
-from ..dungeons.AbstractDungeon import AbstractDungeon
+
 from ..core.Settings import Settings
 from ..core.AbstractCreature import AbstractCreature
 import math
@@ -27,6 +27,7 @@ class DamageInfo:
             self.type = self.DamageType.NORMAL
 
     def applyPowers(self, owner: AbstractCreature, target: AbstractCreature):
+        from ..dungeons.AbstractDungeon import AbstractDungeon
         self.output = self.base
         self.isModified = False
         tmp = float(self.output)
@@ -98,6 +99,7 @@ class DamageInfo:
 
     @classmethod
     def createDamageMatrix(cls, baseDamage: int, isPureDamage: bool = False, isOrbDamage: bool = None):
+        from ..dungeons.AbstractDungeon import AbstractDungeon
         retVal = [0 for _ in range(len(AbstractDungeon.getMonsters().monsters))]
         if isOrbDamage is not None:
             i = 0

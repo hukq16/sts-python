@@ -1,12 +1,12 @@
-
+# finished
 from ..AbstractGameAction import AbstractGameAction
-from ...dungeons.AbstractDungeon import AbstractDungeon
+
 from ...cards.DamageInfo import DamageInfo
-from ...core.Settings import Settings
+
+
 class DamageAllEnemiesAction(AbstractGameAction):
 
-
-    def __init__(self, source, type, amount = None, baseDamage = None):
+    def __init__(self, source, type, amount=None, baseDamage=None):
         super().__init__()
         self.baseDamage = 0
         self.firstFrame = True
@@ -18,35 +18,28 @@ class DamageAllEnemiesAction(AbstractGameAction):
         if amount is not None and baseDamage is None:
             self.damage = amount
 
-
         if amount is None and baseDamage is not None:
             self.baseDamage = baseDamage
             self.utilizeBaseDamage = True
             self.damage = []
 
-
     def update(self):
-        i = 0
-        if self.firstFrame:
+        from ...dungeons.AbstractDungeon import AbstractDungeon
 
-            i = len(AbstractDungeon.getCurrRoom().monsters.monsters)
+        if self.firstFrame:
             if self.utilizeBaseDamage:
                 self.damage = DamageInfo.createDamageMatrix(self.baseDamage)
             self.firstFrame = False
 
         self.tickDuration()
-        if self.isDone:
-            var4 = AbstractDungeon.player.powers.iterator()
 
-            while var4.hasNext():
-                p = var4.next()
+        if self.isDone:
+            for p in AbstractDungeon.player.powers:
                 p.onDamageAllEnemies(self.damage)
 
-            temp = len(AbstractDungeon.getCurrRoom().monsters.monsters)
-
-            for i in range(0, temp):
-                (AbstractDungeon.getCurrRoom().monsters.monsters[i]).damage(DamageInfo(self.source, self.damage[i], self.damageType))
+            for monster in AbstractDungeon.getCurrRoom().monsters.monsters:
+                if not monster.isDeadOrEscaped():
+                    monster.damage(DamageInfo(self.source, self.damage[monster.index], self.damageType))
 
             if AbstractDungeon.getCurrRoom().monsters.areMonstersBasicallyDead():
                 AbstractDungeon.actionManager.clearPostCombatActions()
-

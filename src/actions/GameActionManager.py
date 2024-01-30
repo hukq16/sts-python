@@ -1,5 +1,5 @@
-from ..dungeons.AbstractDungeon import AbstractDungeon
-from ..rooms import AbstractRoom
+
+
 class GameActionManager:
     totalDiscardedThisTurn = 0
     damageReceivedThisTurn = 0
@@ -39,10 +39,14 @@ class GameActionManager:
         # self.monsterAttacksQueued = True
 
     def addToTop(self, action):
+        from ..dungeons.AbstractDungeon import AbstractDungeon
+        from ..rooms import AbstractRoom
         if AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT:
             self.actions.insert(0, action)
 
     def addToBottom(self, action):
+        from ..dungeons.AbstractDungeon import AbstractDungeon
+        from ..rooms import AbstractRoom
         if AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT:
             self.actions.append(action)
         pass

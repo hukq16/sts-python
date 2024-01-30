@@ -1,22 +1,24 @@
-from ...dungeons.AbstractDungeon import AbstractDungeon
-
-
 class EnergyPanel:
     totalCount = 0
 
-    def setEnergy(self, energy):
-        self.totalCount = energy
+    @classmethod
+    def setEnergy(cls, energy):
+        cls.totalCount = energy
 
-    def addEnergy(self, e: int):
-        self.totalCount += e
+    @classmethod
+    def addEnergy(cls, e: int):
+        cls.totalCount += e
 
-        if self.totalCount > 999:
-            self.totalCount = 999
+        if cls.totalCount > 999:
+            cls.totalCount = 999
 
-    def useEnergy(self, e: int):
-        self.totalCount -= e
-        if self.totalCount < 0:
-            self.totalCount = 0
+    @classmethod
+    def useEnergy(cls, e: int):
+        cls.totalCount -= e
+        if cls.totalCount < 0:
+            cls.totalCount = 0
 
-    def getCurrentEnergy(self):
-        return 0 if AbstractDungeon.player is None else self.totalCount
+    @classmethod
+    def getCurrentEnergy(cls):
+        from ...dungeons.AbstractDungeon import AbstractDungeon
+        return 0 if AbstractDungeon.player is None else cls.totalCount

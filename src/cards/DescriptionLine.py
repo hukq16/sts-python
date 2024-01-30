@@ -1,5 +1,7 @@
+# finished
 from ..core.Settings import Settings
 import re
+
 
 class DescriptionLine:
     text: str = None

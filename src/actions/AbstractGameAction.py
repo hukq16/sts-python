@@ -1,6 +1,6 @@
 # nearly finished
 from enum import Enum
-from ..dungeons.AbstractDungeon import AbstractDungeon
+
 from ..cards.DamageInfo import DamageInfo
 from ..core.AbstractCreature import AbstractCreature
 
@@ -47,18 +47,21 @@ class AbstractGameAction:
             return True
 
     def addToBot(self, action):
+        from ..dungeons.AbstractDungeon import AbstractDungeon
         AbstractDungeon.actionManager.addToBottom(action)
 
     def addToTop(self, action):
+        from ..dungeons.AbstractDungeon import AbstractDungeon
         AbstractDungeon.actionManager.addToTop(action)
 
     def update(self):
         raise NotImplementedError
 
-    # def tickDuration(self):
-    #     self.duration -= getDeltaTime()
-    #     if self.duration < 0.0:
-    #         self.isDone = True
+    def tickDuration(self):
+        # pass
+        # self.duration -= getDeltaTime()
+        # if self.duration < 0.0:
+        self.isDone = True
 
     def shouldCancelAction(self):
         return self.target is None or self.source is not None and self.source.isDying or self.target.isDeadOrEscaped()

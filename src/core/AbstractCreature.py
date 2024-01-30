@@ -1,17 +1,13 @@
 # finished
 import math
 
-from ..cards.DamageInfo import DamageInfo
-from ..powers.AbstractPower import AbstractPower, PowerType
-from ..monsters.AbstractMonster import AbstractMonster
-from ..dungeons.AbstractDungeon import AbstractDungeon
 from ..core.Settings import Settings
 
 
 class AbstractCreature:
     name: str = None
     id: str = None
-    powers: [AbstractPower] = []
+    powers: [] = []
     isPlayer: bool = None
     isBloodied: bool = None
     gold: int = None
@@ -27,15 +23,18 @@ class AbstractCreature:
     def __init__(self):
         pass
 
-    def damage(self, var1: DamageInfo):
+    def damage(self, var1):
         raise NotImplementedError
 
     def brokeBlock(self):
+        from ..dungeons.AbstractDungeon import AbstractDungeon
+        from ..monsters.AbstractMonster import AbstractMonster
         if isinstance(self, AbstractMonster):
             for r in AbstractDungeon.player.relics:
                 r.onLoseBlock(self)
 
-    def decrementBlock(self, info: DamageInfo, damageAmount: int):
+    def decrementBlock(self, info, damageAmount: int):
+        from ..cards.DamageInfo import DamageInfo
         if info.type != DamageInfo.DamageType.HP_LOSS and self.currentBlock > 0:
             if damageAmount > self.currentBlock:
                 damageAmount -= self.currentBlock
@@ -54,6 +53,7 @@ class AbstractCreature:
         return damageAmount
 
     def increaseMaxHp(self, amount: int):
+        from ..dungeons.AbstractDungeon import AbstractDungeon
         if (not Settings.isEndless) or not AbstractDungeon.player.hasBlight("FullBelly"):
             if amount < 0:
                 pass
@@ -94,6 +94,7 @@ class AbstractCreature:
             self.gold += amount
 
     def heal(self, healAmount: int):
+        from ..dungeons.AbstractDungeon import AbstractDungeon
         if Settings.isEndless and self.isPlayer and AbstractDungeon.player.hasBlight("FullBelly"):
             healAmount = math.trunc(healAmount / float(2))
             if healAmount < 1:
@@ -127,8 +128,10 @@ class AbstractCreature:
             self.currentHealth = self.maxHealth
 
     def addBlock(self, blockAmount: int):
+        from ..dungeons.AbstractDungeon import AbstractDungeon
         tmp = float(blockAmount)
         if self.isPlayer:
+
             for r in AbstractDungeon.player.relics:
                 tmp = float(r.onPlayerGainedBlock(tmp))
 
@@ -155,7 +158,8 @@ class AbstractCreature:
         if self.currentBlock < 0:
             self.currentBlock = 0
 
-    def addPower(self, powerToApply: AbstractPower):
+    def addPower(self, powerToApply):
+        from ..powers.AbstractPower import PowerType
         hasBuffAlready = False
 
         for p in self.powers:

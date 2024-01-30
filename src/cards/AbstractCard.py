@@ -1,11 +1,9 @@
+# finished
 from enum import Enum
 from uuid import UUID, uuid4
 from .DamageInfo import DamageInfo
 from .DescriptionLine import DescriptionLine
-from ..dungeons import AbstractDungeon
-from ..core.Settings import Settings
 
-from ..rooms.AbstractRoom import AbstractRoom
 import math
 
 
@@ -391,36 +389,39 @@ class AbstractCard:
         pass
 
     def cardPlayable(self, m):
+        from ..dungeons.AbstractDungeon import AbstractDungeon
         if (self.target != CardTarget.ENEMY and self.target != CardTarget.SELF_AND_ENEMY or m is None or (
-                not m.isDying)) and not AbstractDungeon.AbstractDungeon.getMonsters().areMonstersBasicallyDead():
+                not m.isDying)) and not AbstractDungeon.getMonsters().areMonstersBasicallyDead():
             return True
         else:
-            self.cantUseMessage = None
+            self.cantUseMessage = ''
             return False
 
     def hasEnoughEnergy(self):
-        if AbstractDungeon.AbstractDungeon.actionManager.turnHasEnded:
+        from ..dungeons.AbstractDungeon import AbstractDungeon
+        from ..ui.panels.EnergyPanel import EnergyPanel
+        if AbstractDungeon.actionManager.turnHasEnded:
             # self.cantUseMessage = self.TEXT[9]
             return False
         else:
-            for p in AbstractDungeon.AbstractDungeon.player.powers:
+            for p in AbstractDungeon.player.powers:
                 if not p.canPlayCard(self):
                     # self.cantUseMessage = self.TEXT[13]
                     return False
 
-            if AbstractDungeon.AbstractDungeon.player.hasPower("Entangled") and self.card_type == CardType.ATTACK:
+            if AbstractDungeon.player.hasPower("Entangled") and self.card_type == CardType.ATTACK:
                 # self.cantUseMessage = self.TEXT[10]
                 return False
 
-            for r in AbstractDungeon.AbstractDungeon.player.relics:
+            for r in AbstractDungeon.player.relics:
                 if not r.canPlay(self):
                     return False
 
-            for b in AbstractDungeon.AbstractDungeon.player.blights:
+            for b in AbstractDungeon.player.blights:
                 if not b.canPlay(self):
                     return False
 
-            for c in AbstractDungeon.AbstractDungeon.player.hand.group:
+            for c in AbstractDungeon.player.hand.group:
                 if not c.canPlay(self):
                     return False
 
@@ -449,10 +450,11 @@ class AbstractCard:
         return True
 
     def canUse(self, p, m):
-        if self.card_type == CardType.STATUS and self.costForTurn < -1 and not AbstractDungeon.AbstractDungeon.player.hasRelic(
+        from ..dungeons.AbstractDungeon import AbstractDungeon
+        if self.card_type == CardType.STATUS and self.costForTurn < -1 and not AbstractDungeon.player.hasRelic(
                 "Medical Kit"):
             return False
-        elif self.card_type == CardType.CURSE and self.costForTurn < -1 and not AbstractDungeon.AbstractDungeon.player.hasRelic(
+        elif self.card_type == CardType.CURSE and self.costForTurn < -1 and not AbstractDungeon.player.hasRelic(
                 "Blue Candle"):
             return False
         else:
@@ -461,7 +463,7 @@ class AbstractCard:
     def use(self, var1, var2):
         raise NotImplementedError
 
-    def getPrice(rarity):
+    def getPrice(self, rarity):
         if rarity == CardRarity.BASIC:
             return 9999
         elif rarity == CardRarity.SPECIAL:
@@ -539,10 +541,12 @@ class AbstractCard:
             return "0" if self.freeToPlay() else str(self.costForTurn)
 
     def freeToPlay(self):
+        from ..dungeons.AbstractDungeon import AbstractDungeon
+        from ..rooms.AbstractRoom import AbstractRoom
         if self.freeToPlayOnce:
             return True
         else:
-            return AbstractDungeon.AbstractDungeon.player is not None and AbstractDungeon.AbstractDungeon.currMapNode is not None and AbstractDungeon.AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT and AbstractDungeon.AbstractDungeon.player.hasPower(
+            return AbstractDungeon.player is not None and AbstractDungeon.currMapNode is not None and AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT and AbstractDungeon.player.hasPower(
                 "FreeAttackPower") and self.card_type == CardType.ATTACK
 
     def onMoveToDiscard(self):
@@ -555,8 +559,10 @@ class AbstractCard:
         pass
 
     def triggerOnEndOfPlayerTurn(self):
+        from ..dungeons.AbstractDungeon import AbstractDungeon
+        from ..actions.common.ExhaustSpecificCardAction import ExhaustSpecificCardAction
         if self.isEthereal:
-            self.addToTop(ExhaustSpecificCardAction(self, AbstractDungeon.AbstractDungeon.player.hand))
+            self.addToTop(ExhaustSpecificCardAction(self, AbstractDungeon.player.hand))
 
     def triggerOnEndOfTurnForPlayingCard(self):
         pass
@@ -601,8 +607,9 @@ class AbstractCard:
         pass
 
     def applyPowers(self):
+        from ..dungeons.AbstractDungeon import AbstractDungeon
         self.applyPowersToBlock()
-        player = AbstractDungeon.AbstractDungeon.player
+        player = AbstractDungeon.player
         self.isDamageModified = False
         if not self.isMultiDamage:
             tmp = float(self.baseDamage)
@@ -630,7 +637,7 @@ class AbstractCard:
             self.damage = math.floor(tmp)
 
         else:
-            m = AbstractDungeon.AbstractDungeon.getCurrRoom().monsters.monsters
+            m = AbstractDungeon.getCurrRoom().monsters.monsters
 
             tmp = [float(self.baseDamage) for _ in m]
 
@@ -662,13 +669,14 @@ class AbstractCard:
             self.damage = self.multiDamage[0]
 
     def applyPowersToBlock(self):
+        from ..dungeons.AbstractDungeon import AbstractDungeon
         self.isBlockModified = False
         tmp = float(self.baseBlock)
 
-        for p in AbstractDungeon.AbstractDungeon.player.powers:
+        for p in AbstractDungeon.player.powers:
             tmp = p.modifyBlock(tmp, self)
 
-        for p in AbstractDungeon.AbstractDungeon.player.powers:
+        for p in AbstractDungeon.player.powers:
             tmp = p.modifyBlockLast(tmp)
 
         if self.baseBlock != math.floor(tmp):
@@ -682,8 +690,9 @@ class AbstractCard:
         self.calculateCardDamage(mo)
 
     def calculateCardDamage(self, mo):
+        from ..dungeons.AbstractDungeon import AbstractDungeon
         self.applyPowersToBlock()
-        player = AbstractDungeon.AbstractDungeon.player
+        player = AbstractDungeon.player
         self.isDamageModified = False
 
         if not self.isMultiDamage and mo is not None:
@@ -722,7 +731,7 @@ class AbstractCard:
             self.damage = math.floor(tmp)
 
         else:
-            m = AbstractDungeon.AbstractDungeon.getCurrRoom().monsters.monsters
+            m = AbstractDungeon.getCurrRoom().monsters.monsters
             tmp = [float(self.baseDamage) for _ in m]
 
             # Calculating damage for each monster
@@ -767,10 +776,12 @@ class AbstractCard:
         self.isDamageModified = False
 
     def addToBot(self, action):
-        AbstractDungeon.AbstractDungeon.actionManager.addToBottom(action)
+        from ..dungeons.AbstractDungeon import AbstractDungeon
+        AbstractDungeon.actionManager.addToBottom(action)
 
     def addToTop(self, action):
-        AbstractDungeon.AbstractDungeon.actionManager.addToTop(action)
+        from ..dungeons.AbstractDungeon import AbstractDungeon
+        AbstractDungeon.actionManager.addToTop(action)
 
     def toString(self):
         return self.name
