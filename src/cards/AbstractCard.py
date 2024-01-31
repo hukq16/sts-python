@@ -14,6 +14,9 @@ class CardTags(Enum):
     STARTER_DEFEND = 3
     STARTER_STRIKE = 4
 
+    def __lt__(self, other):
+        return self.value < other.value
+
     def __int__(self):
         return self.value
 
@@ -28,6 +31,9 @@ class CardType(Enum):
     def __int__(self):
         return self.value
 
+    def __lt__(self, other):
+        return self.value < other.value
+
 
 class CardRarity(Enum):
     BASIC = 0
@@ -39,6 +45,9 @@ class CardRarity(Enum):
 
     def __int__(self):
         return self.value
+
+    def __lt__(self, other):
+        return self.value < other.value
 
 
 class CardColor(Enum):
@@ -53,6 +62,10 @@ class CardColor(Enum):
         return self.value
 
 
+    def __lt__(self, other):
+        return self.value < other.value
+
+
 class CardTarget(Enum):
     ENEMY = 0
     ALL_ENEMY = 1
@@ -63,6 +76,9 @@ class CardTarget(Enum):
 
     def __int__(self):
         return self.value
+
+    def __lt__(self, other):
+        return self.value < other.value
 
 
 def compare_to(str1: str, str2: str):
