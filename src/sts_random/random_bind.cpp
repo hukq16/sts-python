@@ -8,7 +8,7 @@ namespace py = pybind11;
 PYBIND11_MODULE(sts_random,m){
     m.doc() = "pybind11 for sts_random";
     py::class_<java::Random>(m,"JavaRandom")
-        .def(py::init<std::uint64_t>())
+        .def(py::init<std::int64_t>())
         .def("nextInt",py::overload_cast<std::int32_t>(&java::Random::nextInt))
         .def("nextInt",py::overload_cast<>(&java::Random::nextInt))
         .def("next",&java::Random::next)

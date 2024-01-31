@@ -789,6 +789,12 @@ class AbstractCard:
     def compareTo(self, other):
         return compare_to(self.cardID, other.cardID)
 
+    def __lt__(self, other):
+        return compare_to(self.cardID, other.cardID) < 0
+
+    def __eq__(self, other):
+        return compare_to(self.cardID, other.cardID) == 0
+
     def getMetricID(self):
         id_in = self.cardID
         if self.upgraded:

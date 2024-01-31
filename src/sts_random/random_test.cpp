@@ -6,7 +6,7 @@
 // Test for java::Random
 void test_java_random() {
     // Test constructor and seed
-    java::Random randomJava(12345678);
+    java::Random randomJava(-12345678);
 
     // Test nextInt()
     std::cout << "java::Random nextInt(): " << randomJava.nextLong() << std::endl;

@@ -45,15 +45,14 @@ class AbstractOrb:
     def update(self):
         pass
 
-
-def getRandomOrb(useCardRng):
-    from ..dungeons.AbstractDungeon import AbstractDungeon
-    from .Lightning import Lightning
-    from .Dark import Dark
-    from .Frost import Frost
-    from .Plasma import Plasma
-    orbs = [Dark(), Frost(), Lightning(), Plasma()]
-    if useCardRng:
-        return orbs[AbstractDungeon.cardRandomRng.random(len(orbs) - 1)]
-    else:
-        return orbs[MathUtils.randomInt(len(orbs) - 1)]
+    def getRandomOrb(useCardRng):
+        from ..dungeons.AbstractDungeon import AbstractDungeon
+        from .Lightning import Lightning
+        from .Dark import Dark
+        from .Frost import Frost
+        from .Plasma import Plasma
+        orbs = [Dark(), Frost(), Lightning(), Plasma()]
+        if useCardRng:
+            return orbs[AbstractDungeon.cardRandomRng.random(len(orbs) - 1)]
+        else:
+            return orbs[MathUtils.randomInt(len(orbs) - 1)]
